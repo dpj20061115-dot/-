@@ -795,9 +795,15 @@ function renderDashboard(){
     '</div><div class="col-side">'+
     '<div class="card"><div class="card-header"><span class="card-title">⏰ 考试倒计时</span></div>'+examHTML+'</div>'+
     '<div class="card"><div class="card-header"><span class="card-title">📎 即将截止作业</span></div>'+
-    curAs.filter(function(a){return a.status==='进行中'||a.status==='待开始';})
-      .sort(function(a,b){return new Date(a.deadline)-new Date(b.deadline);}).slice(0,5)
-      .map(function(a){var rem=daysBetween(today(),a.deadline);return '<div style="padding:6px;border-radius:4px;background:'+(rem<=3?'#fde8e8':rem<=7?'#fef3e0':'transparent')+';">📎 '+escapeHtml(a.title)+'<br><span class="text-secondary">⏰ '+rem+'天后 | '+(getSubjectById(a.subjectId)?.name||'')+'</span></div>';}).join('')||'<div class="empty-state"><p>暂无待交作业 🎉</p></div>'+
+    (function(){
+      var pending=curAs.filter(function(a){return a.status==='进行中'||a.status==='待开始';})
+        .sort(function(a,b){return new Date(a.deadline)-new Date(b.deadline);}).slice(0,5);
+      if(pending.length===0){
+        return '<div class="empty-state"><p>暂无待交作业 🎉</p><button class="btn btn-primary btn-sm mt-8" onclick="switchTab(\'assignments\')">📎 添加作业</button></div>';
+      }
+      return pending.map(function(a){var rem=daysBetween(today(),a.deadline);return '<div style="padding:6px;border-radius:4px;background:'+(rem<=3?'#fde8e8':rem<=7?'#fef3e0':'transparent')+';">📎 '+escapeHtml(a.title)+'<br><span class="text-secondary">⏰ '+rem+'天后 | '+(getSubjectById(a.subjectId)?.name||'')+'</span></div>';}).join('')+
+        '<button class="btn btn-sm btn-outline mt-8" style="width:100%;" onclick="switchTab(\'assignments\')">📎 管理作业</button>';
+    })()+
     '</div></div></div>';
 }
 
